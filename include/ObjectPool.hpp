@@ -25,8 +25,9 @@ private: // Data.
 
 private: // Helpers.
 	bool AllocPoolBlock () {
-		if (!m_pool)
+		if (m_pool)
 			return false;
+
 		m_pool    = new BlockEntry[m_objectsPerBlock];
 		m_indices = new uint32_t[m_objectsPerBlock];
 
@@ -45,6 +46,10 @@ public: // Construction.
 		m_objectsPerBlock(objectsPerBlock)
 	{}
 
+	~ObjectPool () {
+		DestroyAll();
+	}
+
 public: // Queries.
 
 public: // Commands.
@@ -61,11 +66,16 @@ public: // Commands.
 			Free(m_indices[m_freeIndex - 1]);
 
 		delete [] m_indices;
+		m_indices = nullptr;
 		delete [] m_pool;
+		m_pool = nullptr;
 	}
 
 
 	uint32_t Alloc () {
+		if (m_freeIndex >= m_objectsPerBlock)
+			return static_cast<uint32_t>(-1);
+
 		BlockEntry & entry = m_pool[m_indices[m_freeIndex]];
 		++entry.generation;
 		new (&entry.object) T_Type;
@@ -101,16 +111,17 @@ public: // Commands.
 		if (!m_freeIndex)
 			return false;
 
-		if (generation) {
-			BlockEntry & entry = m_pool[index];
-			if (generation != entry.generation)
-				return false;
-		}
+		BlockEntry & entry = m_pool[index];
+		if (generation && generation != entry.generation)
+			return false;
 
 		// Find index in m_indices, to swap the last alloc'd index-index with the one just free'd.
 		for (uint32_t indexIndex = m_freeIndex - 1; indexIndex < m_freeIndex; --indexIndex) {
 			if (m_indices[indexIndex] != index)
 				continue;
+
+			T_Type * obj = reinterpret_cast<T_Type *>(&entry.object);
+			obj->~T_Type();
 
 			// swap last still-alive index with just-free'd index
 			uint32_t stillAliveIndex = m_indices[m_freeIndex - 1];
