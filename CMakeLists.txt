@@ -1,22 +1,11 @@
 cmake_minimum_required(VERSION 3.2)
 
-set(src_files
-	src/DataMap.cpp
-	src/DataMapMutator.cpp
-	src/DataMapReader.cpp
-	src/DataMapReaderSimple.cpp
-	src/DataNode.cpp
-	src/ObjectPool.cpp
+set(header_files
+	include/ObjectPool.hpp
 	)
 
-set(header_files
-	include/csaru-container-cpp.h
-	include/DataMap.hpp
-	include/DataMapMutator.hpp
-	include/DataMapReader.hpp
-	include/DataMapReaderSimple.hpp
-	include/DataNode.hpp
-	include/ObjectPool.hpp
+set(src_files
+	src/ObjectPool.cpp
 	)
 
 # CSaruDir must be set in your environment variables!  It should point to a
