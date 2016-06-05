@@ -48,10 +48,11 @@ public: // Construction.
 public: // Queries.
 
 public: // Commands.
-	void Prepare () {
+	bool Prepare () {
 		if (!AllocPoolBlock())
 			return false;
 		m_freeIndex = 0;
+		return true;
 	}
 
 
