@@ -6,6 +6,7 @@ set(src_files
 	src/DataMapReader.cpp
 	src/DataMapReaderSimple.cpp
 	src/DataNode.cpp
+	src/ObjectPool.cpp
 	)
 
 set(header_files
@@ -15,6 +16,7 @@ set(header_files
 	include/DataMapReader.hpp
 	include/DataMapReaderSimple.hpp
 	include/DataNode.hpp
+	include/ObjectPool.hpp
 	)
 
 # CSaruDir must be set in your environment variables!  It should point to a
