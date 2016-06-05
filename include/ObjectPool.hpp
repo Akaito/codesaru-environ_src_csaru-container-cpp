@@ -17,6 +17,19 @@ public: // Types and constants.
 		uint8_t   object[sizeof(T_Type)];
 	};
 
+
+	struct Handle {
+		ObjectPool * pool       = nullptr;
+		uint32_t     index      = 0;
+		uint32_t     generation = 0;
+
+		T_Type * Get () {
+			if (!pool || !generation)
+				return nullptr;
+			return pool->Get(index, generation);
+		}
+	};
+
 private: // Data.
 	BlockEntry * m_pool            = nullptr; // multiple blocks not yet supported; here's just a single one
 	uint32_t *   m_indices         = nullptr; // indices of alloc'd/free entries in the pool
@@ -72,14 +85,30 @@ public: // Commands.
 	}
 
 
-	uint32_t Alloc () {
-		if (m_freeIndex >= m_objectsPerBlock)
-			return static_cast<uint32_t>(-1);
+	T_Type * Alloc (Handle * optHandleOut) {
+		if (!m_pool || !m_indices)
+			return nullptr;
 
-		BlockEntry & entry = m_pool[m_indices[m_freeIndex]];
+		if (m_freeIndex >= m_objectsPerBlock) {
+			if (optHandleOut) {
+				optHandleOut->pool       = this;
+				optHandleOut->index      = uint32_t(-1);
+				optHandleOut->generation = 0;
+			}
+			return nullptr;
+		}
+
+		uint32_t     index = m_indices[m_freeIndex++];
+		BlockEntry & entry = m_pool[index];
 		++entry.generation;
-		new (&entry.object) T_Type;
-		return m_indices[m_freeIndex++];
+		T_Type * obj = new (&entry.object) T_Type;
+
+		if (optHandleOut) {
+			optHandleOut->pool       = this;
+			optHandleOut->index      = index;
+			optHandleOut->generation = entry.generation;
+		}
+		return obj;
 	}
 
 
