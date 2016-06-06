@@ -85,6 +85,7 @@ public: // Commands.
 	}
 
 
+	// TODO : Support variadic args for T_Type constructor.
 	T_Type * Alloc (Handle * optHandleOut) {
 		if (!m_pool || !m_indices)
 			return nullptr;
