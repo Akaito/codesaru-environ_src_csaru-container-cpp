@@ -85,8 +85,8 @@ public: // Commands.
 	}
 
 
-	// TODO : Support variadic args for T_Type constructor.
-	T_Type * Alloc (Handle * optHandleOut) {
+	template <typename... T_Args>
+	T_Type * Alloc (Handle * optHandleOut, T_Args... constructorArgs) {
 		if (!m_pool || !m_indices)
 			return nullptr;
 
@@ -102,7 +102,7 @@ public: // Commands.
 		uint32_t     index = m_indices[m_freeIndex++];
 		BlockEntry & entry = m_pool[index];
 		++entry.generation;
-		T_Type * obj = new (&entry.object) T_Type;
+		T_Type * obj = new (&entry.object) T_Type(constructorArgs...);
 
 		if (optHandleOut) {
 			optHandleOut->pool       = this;
