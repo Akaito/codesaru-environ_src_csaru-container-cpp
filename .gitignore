@@ -11,14 +11,10 @@ Release
 *.sdf
 
 # nix
-Makefile
+*.d
+*.o
 *.a
-
-# CMake
-CMakeFiles
-CMakeCache.txt
-cmake_install.cmake
-install_manifest.txt
+libcsaru-container-cpp
 
 # Python
 __pycache__
